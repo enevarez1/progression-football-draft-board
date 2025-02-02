@@ -1,0 +1,8 @@
+number,first_name,last_name,position,age,culture,height,weight,school,college_name,region,division,scout_name,season,week,evaluation,range,confidence,player_id
+20,first,player,WR,21,,72,196,Oregon,Seagulls,Pacific Northwest,1,Media,13,3,81,5,50,10001
+20,first,player,WR,21,strategic,72,196,Oregon,Seagulls,Pacific Northwest,1,Media,13,3,80,2,65,10001
+20,first,player,WR,21,strategic,72,196,Oregon,Seagulls,Pacific Northwest,1,Media,13,3,78,2,65,10001
+20,first,player,WR,21,strategic,72,196,Oregon,Seagulls,Pacific Northwest,1,Media,13,3,82,2,65,10001
+13,second,player,QB,21,,72,196,Oregon,Seagulls,Pacific Northwest,1,Media,13,3,63,5,50,10002
+13,second,player,QB,21,professional,72,196,Oregon,Seagulls,Pacific Northwest,1,Media,13,3,72,2,65,10002
+13,second,player,QB,21,professional,72,196,Oregon,Seagulls,Pacific Northwest,1,Media,13,3,74,2,65,10002

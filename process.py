@@ -45,5 +45,4 @@ def derive_ras(combine):
 
     ## Fill in formula
 
-    
     return score
