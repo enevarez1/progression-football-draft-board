@@ -1,6 +1,6 @@
 import csv
 
-from model.model import Evaluation, Player
+from src.report.model import Evaluation, Player
 
 def map_players(file_path):
 
