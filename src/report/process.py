@@ -45,6 +45,27 @@ def derive_ras(combine):
     score = 0.0
 
 
-    ## Fill in formula
+    # Grab combine data from each exercise, store them each value in an array.
+    # After set the min and the max, and map it to the exercise in a dictionary.
+    # We need a reverse because sometimes lower number is better, e.g. 40 time
+
+    ## Fill in formula 
 
     return score
+
+def derive_score_from_exercise(exercise, exercise_map, player):
+    
+    # Some have better score when they are lower
+    reverse = determine_reversal(exercise)
+
+    if reverse: 
+        score = (float)(exercise_map[exercise].max - player.exercise[exercise]) / (exercise_map[exercise].max - exercise_map[exercise].min) * 10
+    else:
+        score = (float)(player.exercise[exercise] - exercise_map[exercise].min) / (exercise_map[exercise].max - exercise_map[exercise].min) * 10
+    return max(0, min(10, score))  
+
+def determine_reversal(exercise):
+    if exercise is '40_time' or 'cone_drill' or 'shuttle_20' or 'shuttle_60':
+        return True
+    else:
+        return False

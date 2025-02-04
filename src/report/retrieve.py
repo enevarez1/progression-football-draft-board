@@ -27,3 +27,6 @@ def map_players(file_path):
             players[player.player_id] = player
 
     return players
+
+def map_combine():
+    return
