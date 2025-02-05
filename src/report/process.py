@@ -1,4 +1,5 @@
-from report.model import Evaluation, Exercise, Player
+import csv
+from src.report.model import Evaluation, Exercise, Player
 
 DRILL_LIST = [
         '40_time',
@@ -10,24 +11,26 @@ DRILL_LIST = [
         'shuttle_60'
     ]
 
-def map_players(csvFile):
+def map_players(file_path):
     players = {}
-    for lines in csvFile:
-            ## If player exist, I want to add on to their evaluation array
-            ## I also want to check if they have a culture
-            ## It could just be media report that was old report.
-            if lines['player_id'] in players:
-                player = players[lines['player_id']]
-                if player.culture == '':
-                    player.culture = lines['culture']
-                evaluation = Evaluation(lines['evaluation'], lines['range'], lines['confidence'])
-                player.evaluation.append(evaluation)
-                lines['player_id'] = player
-
-            ## Make a new player if they dont exist, using the player Id as the Key
-            evaluation = Evaluation(lines['evaluation'], lines['range'], lines['confidence'])
-            player = Player(lines['first_name'], lines['last_name'], lines['position'], lines['age'], lines['player_id'], lines['culture'], evaluation)
-            players[player.player_id] = player
+    with open(file_path, mode='r') as file:
+        csvFile = csv.DictReader(file)
+        for lines in csvFile:
+                ## If player exist, I want to add on to their evaluation array
+                ## I also want to check if they have a culture
+                ## It could just be media report that was old report.
+                if lines['player_id'] in players:
+                    player = players[lines['player_id']]
+                    if player.culture == '':
+                        player.culture = lines['culture']
+                    evaluation = Evaluation(lines['evaluation'], lines['range'], lines['confidence'])
+                    player.evaluation.append(evaluation)
+                    lines['player_id'] = player
+                ## Make a new player if they dont exist, using the player Id as the Key
+                else:
+                    evaluation = Evaluation(lines['evaluation'], lines['range'], lines['confidence'])
+                    player = Player(lines['first_name'], lines['last_name'], lines['position'], lines['age'], lines['player_id'], lines['culture'], evaluation)
+                    players[player.player_id] = player
 
     return players
 
@@ -55,23 +58,26 @@ def most_likely_raw_overall(evaluations):
     most_likely_number = weighted_sum / total_weight
     return most_likely_number
 
-def map_combine(players, csvFile):
-    for lines in csvFile:
-        # TODO add exception
-        if lines['player_id'] in players:
-            player_row = lines['player_id']
-            # Map the combine
-            combine = [
-                Exercise("40_time", player_row['40_time']),
-                Exercise("bench_press", player_row['bench_press']),
-                Exercise("broad_jump", player_row['broad_jump']),
-                Exercise("vertical_jump", player_row['vertical_jump']),
-                Exercise("cone_drill", player_row['cone_drill']),
-                Exercise("shuttle_20", player_row['shuttle_20']),
-                Exercise("shuttle_60", player_row['shuttle_60'])
-            ]
-            players['player_id'].combine = combine
-    return players
+def map_combine(players, file_path):
+    with open(file_path, mode='r') as file:
+        csvFile = csv.DictReader(file)
+        for lines in csvFile:
+            # TODO add exception
+            if lines['player_id'] in players:
+                player_row = lines
+                player_id = player_row['player_id']
+                # Map the combine
+                combine = [
+                    Exercise("40_time", player_row["40_time"]),
+                    Exercise("bench_press", player_row['bench_press']),
+                    Exercise("broad_jump", player_row['broad_jump']),
+                    Exercise("vertical_jump", player_row['vertical_jump']),
+                    Exercise("cone_drill", player_row['cone_drill']),
+                    Exercise("shuttle_20", player_row['shuttle_20']),
+                    Exercise("shuttle_60", player_row['shuttle_60'])
+                ]
+
+                players[player_id].combine.append(combine)
 
 def derive_score_from_report(report_text):
     # Hardcoded Values for now

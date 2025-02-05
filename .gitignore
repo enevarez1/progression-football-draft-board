@@ -174,3 +174,4 @@ cython_debug/
 .~lock.test_data.csv#
 .~lock.scout.csv#
 .~lock.combine.csv#
+.~lock.combine_test.csv#
