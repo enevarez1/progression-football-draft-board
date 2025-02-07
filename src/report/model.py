@@ -19,6 +19,7 @@ class Player:
         self.evaluation = [evaluation]
         self.combine = []
         self.potential_raw = 0.0
+        self.potential_weighted = 0.0
         self.ras_score = 0.0
         self.report_score = 0.0
         self.total_score = 0.0
@@ -29,10 +30,10 @@ class Player:
 
 @auto_str
 class Evaluation:
-    def __init__(self, score, confidence, range):
+    def __init__(self, score, range, confidence):
         self.score = score
-        self.confidence = confidence
         self.range = range
+        self.confidence = confidence
 
 @auto_str
 class Exercise:

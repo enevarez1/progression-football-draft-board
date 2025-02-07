@@ -33,18 +33,20 @@ def map_players(file_path):
                     player = Player(lines['first_name'], lines['last_name'], lines['position'], lines['age'], lines['player_id'], lines['culture'], evaluation)
                     players[player.player_id] = player
 
+                
+
     return players
 
-def most_likely_raw_overall(evaluations):
+def most_likely_raw_overall(player):
     weighted_scores = []
+    for entry in player.evaluation:
 
-    for entry in evaluations:
-        score = entry['score']
-        range = entry['range']
-        accuracy = entry['confidence']
+        score = int(entry.score)
+        r = int(entry.range)
+        accuracy = int(entry.confidence)
 
         # Lower range means more certainty, so we divide accuracy by range_value to adjust.
-        range_factor = 1 / (1 + range)
+        range_factor = 1 / (1 + r)
 
         # Adjust the weight by combining accuracy and range_factor
         weight = accuracy * range_factor
@@ -57,7 +59,39 @@ def most_likely_raw_overall(evaluations):
     weighted_sum = sum(score * weight for score, weight in weighted_scores)
 
     most_likely_number = weighted_sum / total_weight
-    return most_likely_number
+
+    # Even with most likely number 
+    # I want it multipled by the wrong rate for a better score
+    rounded_score = round(most_likely_number)
+    fail_chance = []
+
+    # Go through the reports again
+    for evaluation in player.evaluation:
+        report_score = int(evaluation.score)
+        # This allows for a safe range
+        report_range = int(evaluation.range)+1
+        lower_limit = report_score - report_range
+        high_limit = report_score + report_range
+
+        # If its in the range of the reports, I want it, 
+        if lower_limit <= rounded_score <= high_limit:
+            fail_chance.append(1-(int(evaluation.confidence)*.01))
+
+
+    potential_weighted = most_likely_number
+    # Convert failure chance to a decimal
+    failure_chance = 1.0
+    for value in fail_chance:
+        failure_chance *= value
+    potential_weighted *= (1 - failure_chance)
+
+    # Map to player
+    player.potential_raw = most_likely_number
+    player.potential_weighted = round(potential_weighted, 2)
+    
+    # return statement for test
+    # TODO REMOVE
+    return most_likely_number, round(potential_weighted,2)
 
 def map_combine(players, file_path):
     df_combine = pd.read_csv(file_path)
@@ -116,7 +150,7 @@ def derive_max_min_ras(combine_df):
 
     for drill in DRILL_LIST:
         sorted_df = combine_df.sort_values(by=drill)
-        if drill is 'broad_jump':
+        if drill == 'broad_jump':
             # Need to convert because its a string
             min_drill_value = convert_string_to_float(sorted_df[drill].iloc[0])
             max_drill_value = convert_string_to_float(sorted_df[drill].iloc[-1])
@@ -187,7 +221,7 @@ def derive_score_from_exercise(exercise, min_value, max_value, player):
 
 
 def determine_reversal(exercise):
-    if exercise is '40_time' or 'cone_drill' or 'shuttle_20' or 'shuttle_60':
+    if exercise == '40_time' or 'cone_drill' or 'shuttle_20' or 'shuttle_60':
         return True
     else:
         return False
