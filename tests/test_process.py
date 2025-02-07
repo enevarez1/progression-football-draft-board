@@ -1,10 +1,6 @@
 import unittest
-import sys
-import os
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src')))
-
-from report.process import most_likely_raw_overall
+from src.report.process import convert_float_to_feet, convert_string_to_float, most_likely_raw_overall
 
 class TestProcess(unittest.TestCase):
     
@@ -20,6 +16,14 @@ class TestProcess(unittest.TestCase):
     
     def testMostLikelyOverall3Range(self):
         self.assertEqual(0,0)
+
+    def testConvertStringToFloat(self):
+        answer = convert_string_to_float("10'5\"")
+        self.assertEqual(125, answer)
+
+    def testConvertFloatToString(self):
+        answer = convert_float_to_feet(125)
+        self.assertEqual("10'5\"", answer)
 
 if __name__ == '__main__':
     unittest.main()

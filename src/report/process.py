@@ -1,11 +1,12 @@
 import csv
+import pandas as pd 
 from src.report.model import Evaluation, Exercise, Player
 
 DRILL_LIST = [
         '40_time',
         'bench_press',
         'broad_jump',
-        'vertical_drill',
+        'vertical_jump',
         'cone_drill',
         'shuttle_20',
         'shuttle_60'
@@ -59,8 +60,10 @@ def most_likely_raw_overall(evaluations):
     return most_likely_number
 
 def map_combine(players, file_path):
+    df_combine = pd.read_csv(file_path)
     with open(file_path, mode='r') as file:
         csvFile = csv.DictReader(file)
+
         for lines in csvFile:
             # TODO add exception
             if lines['player_id'] in players:
@@ -70,7 +73,7 @@ def map_combine(players, file_path):
                 combine = [
                     Exercise("40_time", player_row["40_time"]),
                     Exercise("bench_press", player_row['bench_press']),
-                    Exercise("broad_jump", player_row['broad_jump']),
+                    Exercise("broad_jump", convert_string_to_float(player_row['broad_jump'])),
                     Exercise("vertical_jump", player_row['vertical_jump']),
                     Exercise("cone_drill", player_row['cone_drill']),
                     Exercise("shuttle_20", player_row['shuttle_20']),
@@ -78,6 +81,8 @@ def map_combine(players, file_path):
                 ]
 
                 players[player_id].combine.append(combine)
+    return derive_max_min_ras(df_combine)
+    
 
 def derive_score_from_report(report_text):
     # Hardcoded Values for now
@@ -98,7 +103,7 @@ def derive_score_from_report(report_text):
 
     return score
 
-def derive_max_min_ras(combine_csv):
+def derive_max_min_ras(combine_df):
 
     exercise_map = {}
 
@@ -110,14 +115,38 @@ def derive_max_min_ras(combine_csv):
     # lets clean it up
 
     for drill in DRILL_LIST:
-        sorted_drill = sorted(combine_csv, key=lambda row: row[drill])
-        min_drill_value = sorted_drill[0]
-        max_drill_value = sorted_drill[-1]
+        sorted_df = combine_df.sort_values(by=drill)
+        if drill is 'broad_jump':
+            # Need to convert because its a string
+            min_drill_value = convert_string_to_float(sorted_df[drill].iloc[0])
+            max_drill_value = convert_string_to_float(sorted_df[drill].iloc[-1])
+        else:
+            min_drill_value = sorted_df[drill].iloc[0].item()
+            max_drill_value = sorted_df[drill].iloc[-1].item()
         exercise_map[drill] = (min_drill_value, max_drill_value)
 
 
     # For each exercise, sort, grab the first and last
     return exercise_map
+
+def convert_string_to_float(string):
+    
+    # 10'5" -> 125
+    parts = string.split("'")
+    feet = int(parts[0]) * 12
+    inches = int(parts[1].replace('"', '')) if parts[1] else 0
+    # take substring after that and add to above
+    
+    return feet + inches
+
+def convert_float_to_feet(number):
+    # 125 -> 10.5
+    inch = number % 12
+    # modulus by 12, take remainder thats your (")
+    feet = int((number - inch) / 12)
+    # subtract remainder and divide by 12, that your (')
+    # concat 
+    return f"{feet}'{inch}\""
 
 def derive_ras(player, exercise_map):
     score = 0.0
@@ -134,23 +163,28 @@ def derive_ras(player, exercise_map):
     # ]
 
     ras_exercise = []
+    count = 0
     for drill in DRILL_LIST:
-        ras_exercise.append(derive_score_from_exercise(drill, *exercise_map[drill], player))
+        ras_exercise.append(derive_score_from_exercise(count, *exercise_map[drill], player))
+        count += 1
     
 
     # sum of all scores / amount of exercise
-    return sum(ras_exercise)/len(ras_exercise)
+    player.ras_score = sum(ras_exercise)/len(ras_exercise)
+    print(player)
 
 def derive_score_from_exercise(exercise, min_value, max_value, player):
     
     # Some have better score when they are lower
     reverse = determine_reversal(exercise)
+    float_value = float(player.combine[0][exercise].value)
 
     if reverse: 
-        score = (float)(max_value - player.exercise[exercise].value) / (max_value - min_value) * 10
+        score = (max_value - float_value) / (max_value - min_value) * 10
     else:
-        score = (float)(player.exercise[exercise].value - min_value) / (max_value - min_value) * 10
+        score = (float_value - min_value) / (max_value - min_value) * 10
     return max(0, min(10, score))  
+
 
 def determine_reversal(exercise):
     if exercise is '40_time' or 'cone_drill' or 'shuttle_20' or 'shuttle_60':
