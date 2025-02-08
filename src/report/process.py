@@ -1,4 +1,5 @@
 import csv
+import re
 import pandas as pd 
 from src.report.model import Evaluation, Exercise, Player
 
@@ -12,6 +13,32 @@ DRILL_LIST = [
         'shuttle_60'
     ]
 
+    # POT
+    # All-Pro
+    # sky-high upside
+    # great upside OR overlooked
+    # great PFL player
+    # most starting depth chart
+    # long-term potential
+
+    # CON
+    # consistently impressive
+    # generally solid
+    # mistakes
+    # film room
+HARD_CODE_SCORECARD = {
+    "All-Pro": 10,
+    "sky-high upside": 8,
+    "great upside": 6,
+    "great PFL player": 4,
+    "most starting depth chart": 2,
+    "long-term potential": 1,
+    "consistently impressive": 10,
+    "generally solid": 8,
+    "mistakes": 4,
+    "film room": 1
+}
+
 def map_players(file_path):
     players = {}
     with open(file_path, mode='r') as file:
@@ -24,12 +51,12 @@ def map_players(file_path):
                     player = players[lines['player_id']]
                     if player.culture == '':
                         player.culture = lines['culture']
-                    evaluation = Evaluation(lines['evaluation'], lines['range'], lines['confidence'])
+                    evaluation = Evaluation(lines['evaluation'], lines['range'], lines['confidence'], lines['text'])
                     player.evaluation.append(evaluation)
                     lines['player_id'] = player
                 ## Make a new player if they dont exist, using the player Id as the Key
                 else:
-                    evaluation = Evaluation(lines['evaluation'], lines['range'], lines['confidence'])
+                    evaluation = Evaluation(lines['evaluation'], lines['range'], lines['confidence'], lines['text'])
                     player = Player(lines['first_name'], lines['last_name'], lines['position'], lines['age'], lines['player_id'], lines['culture'], evaluation)
                     players[player.player_id] = player
 
@@ -63,18 +90,21 @@ def most_likely_raw_overall(player):
     # Even with most likely number 
     # I want it multipled by the wrong rate for a better score
     rounded_score = round(most_likely_number)
+    text_report_score = 0
     fail_chance = []
 
     # Go through the reports again
     for evaluation in player.evaluation:
-        report_score = int(evaluation.score)
+        eval_score = int(evaluation.score)
         # This allows for a safe range
-        report_range = int(evaluation.range)+1
-        lower_limit = report_score - report_range
-        high_limit = report_score + report_range
+        eval_range = int(evaluation.range)+1
+        lower_limit = eval_score - eval_range
+        high_limit = eval_score + eval_range
 
         # If its in the range of the reports, I want it, 
+        # I also only care about text reports in this range
         if lower_limit <= rounded_score <= high_limit:
+            text_report_score += calculate_report_score(evaluation.report,HARD_CODE_SCORECARD)
             fail_chance.append(1-(int(evaluation.confidence)*.01))
 
 
@@ -88,10 +118,23 @@ def most_likely_raw_overall(player):
     # Map to player
     player.potential_raw = most_likely_number
     player.potential_weighted = round(potential_weighted, 2)
+    player.report_score = text_report_score / len(fail_chance)
     
     # return statement for test
     # TODO REMOVE
     return most_likely_number, round(potential_weighted,2)
+
+def calculate_report_score(paragraph, report_scorecard):
+
+    total_score = 0
+    paragraph = paragraph.lower()
+    
+    for phrase, score in report_scorecard.items():
+        pattern = r'(?<!\w)' + re.escape(phrase.lower()).replace(r'\ ', r'\s+') + r'(?!\w)'
+        matches = re.findall(pattern, paragraph)
+        total_score += len(matches) * score
+    
+    return total_score
 
 def map_combine(players, file_path):
     df_combine = pd.read_csv(file_path)
@@ -116,26 +159,6 @@ def map_combine(players, file_path):
 
                 players[player_id].combine.append(combine)
     return derive_max_min_ras(df_combine)
-    
-
-def derive_score_from_report(report_text):
-    # Hardcoded Values for now
-    values = {
-        "all-pro": 10,
-        "sky-high": 9,
-        "starter": 8,
-        "low-ceiling": 7,
-        "film-room": 3,
-        "calm": 7,
-        "consistenly-impressive": 8
-    }
-
-    score = 0
-
-    ## Search through paragraph looking for those key words and add to score
-
-
-    return score
 
 def derive_max_min_ras(combine_df):
 
@@ -204,8 +227,8 @@ def derive_ras(player, exercise_map):
     
 
     # sum of all scores / amount of exercise
-    player.ras_score = sum(ras_exercise)/len(ras_exercise)
-    print(player)
+    ras_dirty = sum(ras_exercise)/len(ras_exercise)
+    player.ras_score = round(ras_dirty, 2)
 
 def derive_score_from_exercise(exercise, min_value, max_value, player):
     

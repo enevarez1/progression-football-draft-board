@@ -30,10 +30,11 @@ class Player:
 
 @auto_str
 class Evaluation:
-    def __init__(self, score, range, confidence):
+    def __init__(self, score, range, confidence, report):
         self.score = score
         self.range = range
         self.confidence = confidence
+        self.report = report
 
 @auto_str
 class Exercise:
