@@ -1,0 +1,5 @@
+number,first_name,last_name,position,age,height,weight,school,name,region,division,40_time,bench_press,broad_jump,vertical_jump,cone_drill,shuttle_20,shuttle_60,wonderlic,link,player_id
+20,first,player,WR,21,72,196,Oregon,Seagulls,Pacific Northwest,1,4.54,14,"10'1""",40.5,6.95,4.34,11.41,13,"=HYPERLINK(""https://progressionfootball.com/players?league=10455&player=49389633"")",10001
+13,second,player,QB,21,72,196,Oregon,Seagulls,Pacific Northwest,1,4.79,32,"9'10""",28,7.73,4.9,12.14,15,"=HYPERLINK(""https://progressionfootball.com/players?league=10455&player=49389804"")",10002
+37,third,player,CB,21,72,196,Oregon,Seagulls,Pacific Northwest,1,4.88,22,"10'5""",30.5,7.84,5.01,11.85,22,"=HYPERLINK(""https://progressionfootball.com/players?league=10455&player=49389686"")",10003
+1,fourth,player,TE,21,72,196,Oregon,Seagulls,Pacific Northwest,1,4.9,28,"10'2""",27,8,5.24,12.34,16,"=HYPERLINK(""https://progressionfootball.com/players?league=10455&player=49389785"")",10004
