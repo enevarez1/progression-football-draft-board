@@ -1,3 +1,4 @@
+from src.report import report
 from src.report.model import Exercise
 from src.report import process
 
@@ -18,6 +19,5 @@ for player in players.values():
     report_score = player.report_score
     player.total_score = potential_weighted + ras_score + report_score
 
-
-## TODO reconvert the inches to string format for broad_jump
-print(players)
+sorted_players = sorted(players.values(), key=lambda player: player.total_score, reverse=True)
+report.generate_board(sorted_players)
