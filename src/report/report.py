@@ -1,7 +1,4 @@
-
-
 import csv
-
 
 HEADER = [
         'Player ID',
@@ -15,7 +12,6 @@ HEADER = [
         'Report Score',
         'Total Board Score'
     ]
-
 
 # Method to write to CSV
 def generate_board(players):

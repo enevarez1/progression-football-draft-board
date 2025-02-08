@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from src.report import report
 from src.report.model import Exercise
 from src.report import process
