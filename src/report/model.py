@@ -22,6 +22,7 @@ class Player:
         self.potential_weighted = 0.0
         self.ras_score = 0.0
         self.report_score = 0.0
+        self.culture_score = 0.0
         self.total_score = 0.0
 
     # def __setattr__(self, name, value):
@@ -41,3 +42,41 @@ class Exercise:
     def __init__(self, name, value):
         self.name = name
         self.value = value
+
+@auto_str
+class UserValues:
+    def __init__(self):
+        self.overall_weight = 1
+        self.ras_weight = 1
+        self.report_weight = 1
+        self.all_pro = 1
+        self.sky_high = 1
+        self.great_upside = 1
+        self.great_pfl = 1
+        self.starting = 1
+        self.long_term = 1
+        self.consistent = 1
+        self.solid = 1
+        self.mistakes = 1
+        self.film = 1
+        self.strategy = 1
+        self.energetic = 1
+        self.professional = 1
+        self.aggressive = 1
+        self.adaptive = 1
+
+        # All Pro in Report
+        # Sky High In Report
+        # Great Upside in Report
+        # Great PFL in Report
+        # Starting Depth in Report
+        # No Long Term in Report
+        # Consistently Impressive in Report
+        # Generally Solid in Report
+        # Makes Mistakes in Report
+        # Film Room in Report
+        # Strategy Culture
+        # Energetic Culture
+        # Professional Culture
+        # Aggressive Culture
+        # Adaptive Culture

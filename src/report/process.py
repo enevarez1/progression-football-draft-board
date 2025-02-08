@@ -39,8 +39,9 @@ HARD_CODE_SCORECARD = {
     "film room": 1
 }
 
-def map_players(file_path):
+def map_players(file_path, custom_values):
     players = {}
+    culture_scorecard = create_scorecard(custom_values, 'culture')
     with open(file_path, mode='r') as file:
         csvFile = csv.DictReader(file)
         for lines in csvFile:
@@ -50,22 +51,29 @@ def map_players(file_path):
                 if lines['player_id'] in players:
                     player = players[lines['player_id']]
                     if player.culture == '':
-                        player.culture = lines['culture']
+                        culture = lines['culture']
+                        player.culture = culture
+                        player.culture_score = culture_scorecard[culture]
+
                     evaluation = Evaluation(lines['evaluation'], lines['range'], lines['confidence'], lines['text'])
                     player.evaluation.append(evaluation)
                     lines['player_id'] = player
                 ## Make a new player if they dont exist, using the player Id as the Key
                 else:
                     evaluation = Evaluation(lines['evaluation'], lines['range'], lines['confidence'], lines['text'])
-                    player = Player(lines['first_name'], lines['last_name'], lines['position'], lines['age'], lines['player_id'], lines['culture'], evaluation)
+                    culture = lines['culture']
+                    player = Player(lines['first_name'], lines['last_name'], lines['position'], lines['age'], lines['player_id'], culture, evaluation)
+                    if 0 < len(culture):
+                        player.culture_score = culture_scorecard[culture]
                     players[player.player_id] = player
 
                 
 
     return players
 
-def most_likely_raw_overall(player):
+def most_likely_raw_overall(player, custom_values):
     weighted_scores = []
+    custom_scorecard = create_scorecard(custom_values, 'report')
     for entry in player.evaluation:
 
         score = int(entry.score)
@@ -104,7 +112,7 @@ def most_likely_raw_overall(player):
         # If its in the range of the reports, I want it, 
         # I also only care about text reports in this range
         if lower_limit <= rounded_score <= high_limit:
-            text_report_score += calculate_report_score(evaluation.report,HARD_CODE_SCORECARD)
+            text_report_score += calculate_report_score(evaluation.report, custom_scorecard)
             fail_chance.append(1-(int(evaluation.confidence)*.01))
 
 
@@ -249,3 +257,26 @@ def determine_reversal(exercise):
         return True
     else:
         return False
+
+def create_scorecard(custom_values, type):
+    if type == 'culture':
+        return {
+            "Strategic": custom_values.strategy,
+            "Energetic": custom_values.energetic,
+            "Professional": custom_values.professional,
+            "Aggressive": custom_values.aggressive,
+            "Adaptable": custom_values.adaptive
+        }
+    elif type == 'report':
+        return {
+            "All-Pro": custom_values.all_pro,
+            "sky-high upside": custom_values.sky_high,
+            "great upside": custom_values.great_upside,
+            "great PFL player": custom_values.great_upside,
+            "most starting depth chart": custom_values.starting,
+            "long-term potential": custom_values.long_term,
+            "consistently impressive": custom_values.consistent,
+            "generally solid": custom_values.solid,
+            "mistakes": custom_values.mistakes,
+            "film room": custom_values.film
+        }
