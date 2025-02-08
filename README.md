@@ -21,5 +21,7 @@ Takes scouting reports from ProgressionFootball.com, and generates a draft repor
 
 ### Coming Soon
 - Culture Ranking
-- User can provide their own scoring
+- Position Ranking
+- User can provide their own scoring for reports scorecard
+- User can provide their own weights for total score
 - UI executable

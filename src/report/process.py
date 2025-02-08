@@ -118,7 +118,8 @@ def most_likely_raw_overall(player):
     # Map to player
     player.potential_raw = most_likely_number
     player.potential_weighted = round(potential_weighted, 2)
-    player.report_score = text_report_score / len(fail_chance)
+    if len(fail_chance) > 0:
+        player.report_score = text_report_score / len(fail_chance)
     
     # return statement for test
     # TODO REMOVE
