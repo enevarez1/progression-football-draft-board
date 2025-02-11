@@ -173,3 +173,6 @@ cython_debug/
 # CSV stuff
 .~lock.*
 board.csv
+combine_test.csv
+scout_reports.csv
+test_data.csv

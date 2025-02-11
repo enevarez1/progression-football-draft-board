@@ -5,8 +5,8 @@ from src.report import process, report, retrieve
 
 custom_values = retrieve.retrieve_custom_values()
 
-players = process.map_players('test_data.csv', custom_values)
-combine_min_max_map= process.map_combine(players, 'combine_test.csv')
+players = process.map_players('scout.csv', custom_values)
+combine_min_max_map= process.map_combine(players, 'combine.csv')
 
 for player in players.values():
     process.derive_ras(player, combine_min_max_map)
