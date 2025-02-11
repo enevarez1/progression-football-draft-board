@@ -5,12 +5,14 @@ HEADER = [
         'First Name',
         'Last Name',
         'Age',
+        'Position',
         'Culture',
         'Potential Raw Overall',
         'Potential Raw Weighted',
         'RAS Score',
         'Report Score',
-        'Total Board Score'
+        'Total Board Score',
+        'Link'
     ]
 
 # Method to write to CSV
@@ -32,10 +34,12 @@ def flatten_player(player):
         'First Name': player.first_name,
         'Last Name': player.last_name,
         'Age': player.age,
+        'Position': player.position,
         'Culture': player.culture,
         'Potential Raw Overall': player.potential_raw,
         'Potential Raw Weighted': player.potential_weighted,
         'RAS Score': player.ras_score,
         'Report Score': player.report_score,
-        'Total Board Score': player.total_score
+        'Total Board Score': player.total_score,
+        'Link': player.link
     }

@@ -18,6 +18,7 @@ class Player:
         self.culture = culture
         self.evaluation = [evaluation]
         self.combine = []
+        self.link = ""
         self.potential_raw = 0.0
         self.potential_weighted = 0.0
         self.ras_score = 0.0

@@ -166,6 +166,9 @@ def map_combine(players, file_path):
                     Exercise("shuttle_60", player_row['shuttle_60'])
                 ]
 
+                # Also map the player link
+                players[player_id].link = player_row['link']
+
                 players[player_id].combine.append(combine)
     return derive_max_min_ras(df_combine)
 
