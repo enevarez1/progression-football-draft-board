@@ -3,24 +3,123 @@
 from src.report.model import Exercise
 from src.report import process, report, retrieve
 
-custom_values = retrieve.retrieve_custom_values()
+import tkinter as tkinter
 
-players = process.map_players('scout.csv', custom_values)
-combine_min_max_map= process.map_combine(players, 'combine.csv')
+window = tkinter.Tk()
+window.title("Automatic Draft Board")
 
-for player in players.values():
-    process.derive_ras(player, combine_min_max_map)
-    process.most_likely_raw_overall(player, custom_values)
+frame = tkinter.Frame(window)
+frame.pack()
 
-    # Reconvert the broad_jump because im not mean
-    # Probably move this
-    player.combine[0][2] = Exercise("broad_jump", process.convert_float_to_feet(player.combine[0][2].value))
+# Saving Score Weights
+user_info_frame =tkinter.LabelFrame(frame, text="Overall Score Weights")
+user_info_frame.grid(row= 0, column=0, padx=20, pady=10)
+
+help_label = tkinter.Label(user_info_frame, text="Select a value from 1 to 5")
+help_label.grid(row=1, column=0)
+
+pot_ovr_label = tkinter.Label(user_info_frame, text="Potential Overall Weight")
+pot_ovr_spinbox = tkinter.Spinbox(user_info_frame, from_=1, to=5)
+pot_ovr_label.grid(row=2, column=0)
+pot_ovr_spinbox.grid(row=3, column=0)
+
+ras_label = tkinter.Label(user_info_frame, text="RAS Score Weight")
+ras_spinbox = tkinter.Spinbox(user_info_frame, from_=1, to=5)
+ras_label.grid(row=2, column=1)
+ras_spinbox.grid(row=3, column=1)
+
+report_label = tkinter.Label(user_info_frame, text="Report Score Weight")
+report_spinbox = tkinter.Spinbox(user_info_frame, from_=1, to=5)
+report_label.grid(row=2, column=2)
+report_spinbox.grid(row=3, column=2)
+
+for widget in user_info_frame.winfo_children():
+    widget.grid_configure(padx=10, pady=5)
+
+# Saving Score Weights
+report_info_frame =tkinter.LabelFrame(frame, text="Report Text Weights")
+report_info_frame.grid(row= 4, column=0,sticky="news", padx=20, pady=10)
+
+help_label = tkinter.Label(report_info_frame, text="Assign a value based on certain words in reports")
+help_label.grid(row=5, column=0)
+
+ap_label = tkinter.Label(report_info_frame, text="All-Pro")
+ap_spinbox = tkinter.Spinbox(report_info_frame, from_=-100, to=100)
+ap_label.grid(row=6, column=0)
+ap_spinbox.grid(row=6, column=1)
+
+
+sh_label = tkinter.Label(report_info_frame, text="Sky-High Upside")
+sh_spinbox = tkinter.Spinbox(report_info_frame, from_=-100, to=100)
+sh_label.grid(row=7, column=0)
+sh_spinbox.grid(row=7, column=1)
+
+gu_label = tkinter.Label(report_info_frame, text="Great PFL Player")
+gu_spinbox = tkinter.Spinbox(report_info_frame, from_=-100, to=100)
+gu_label.grid(row=8, column=0)
+gu_spinbox.grid(row=8, column=1)
+
+gp_label = tkinter.Label(report_info_frame, text="Great Upside")
+gp_spinbox = tkinter.Spinbox(report_info_frame, from_=-100, to=100)
+gp_label.grid(row=9, column=0)
+gp_spinbox.grid(row=9, column=1)
+
+ms_label = tkinter.Label(report_info_frame, text="Most Starting Depth Chart")
+ms_spinbox = tkinter.Spinbox(report_info_frame, from_=-100, to=100)
+ms_label.grid(row=10, column=0)
+ms_spinbox.grid(row=10, column=1)
+
+lt_label = tkinter.Label(report_info_frame, text="Not have long-term Potential")
+lt_spinbox = tkinter.Spinbox(report_info_frame, from_=-100, to=100)
+lt_label.grid(row=11, column=0)
+lt_spinbox.grid(row=11, column=1)
+
+cons_label = tkinter.Label(report_info_frame, text="Consistently Impressive")
+cons_spinbox = tkinter.Spinbox(report_info_frame, from_=-100, to=100)
+cons_label.grid(row=12, column=0)
+cons_spinbox.grid(row=12, column=1)
+
+gs_label = tkinter.Label(report_info_frame, text="Generally Solid")
+gs_spinbox = tkinter.Spinbox(report_info_frame, from_=-100, to=100)
+gs_label.grid(row=13, column=0)
+gs_spinbox.grid(row=13, column=1)
+
+mis_label = tkinter.Label(report_info_frame, text="Makes Mistakes")
+mis_spinbox = tkinter.Spinbox(report_info_frame, from_=-100, to=100)
+mis_label.grid(row=14, column=0)
+mis_spinbox.grid(row=14, column=1)
+
+fr_label = tkinter.Label(report_info_frame, text="Film Room")
+fr_spinbox = tkinter.Spinbox(report_info_frame, from_=-100, to=100)
+fr_label.grid(row=15, column=0)
+fr_spinbox.grid(row=15, column=1)
+
+for widget in report_info_frame.winfo_children():
+    widget.grid_configure(padx=10, pady=5)
+
+window.mainloop()
+
+
+## BUILD A UI
+
+# custom_values = retrieve.retrieve_custom_values()
+
+# players = process.map_players('scout.csv', custom_values)
+# combine_min_max_map= process.map_combine(players, 'combine.csv')
+
+# for player in players.values():
+#     process.derive_ras(player, combine_min_max_map)
+#     process.most_likely_raw_overall(player, custom_values)
+
+#     # Reconvert the broad_jump because im not mean
+#     # Probably move this
+#     player.combine[0][2] = Exercise("broad_jump", process.convert_float_to_feet(player.combine[0][2].value))
     
-    # Do the final total score for csv sorting, with user weights
-    potential_weighted = player.potential_weighted * custom_values.overall_weight
-    ras_score = player.ras_score * custom_values.ras_weight
-    report_score = player.report_score * custom_values.report_weight
-    player.total_score = potential_weighted + ras_score + report_score + player.culture_score
+#     # Do the final total score for csv sorting, with user weights
+#     potential_weighted = player.potential_weighted * custom_values.overall_weight
+#     ras_score = player.ras_score * custom_values.ras_weight
+#     report_score = player.report_score * custom_values.report_weight
+#     player.total_score = potential_weighted + ras_score + report_score + player.culture_score
 
-sorted_players = sorted(players.values(), key=lambda player: player.total_score, reverse=True)
-report.generate_board(sorted_players)
+# sorted_players = sorted(players.values(), key=lambda player: player.total_score, reverse=True)
+# report.generate_board(sorted_players)
