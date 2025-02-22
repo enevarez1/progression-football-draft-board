@@ -3,6 +3,7 @@
 import tkinter.filedialog
 from src.report.model import Exercise, UserValues
 from src.report import process, report, retrieve
+from tkinter import messagebox
 
 import tkinter as tkinter
 
@@ -15,30 +16,24 @@ def select_file(entry):
 def generate_board():
     # grab values and map to UserValues
     custom_values = UserValues()
-    custom_values.overall_weight = pot_ovr_spinbox.get()
-    custom_values.ras_weight = ras_spinbox.get()
-    custom_values.report_weight = report_spinbox.get()
-    custom_values.all_pro = ap_spinbox.get()
-    custom_values.sky_high = sh_spinbox.get()
-    custom_values.great_upside = gu_spinbox.get()
-    custom_values.great_pfl = gp_spinbox.get()
-    custom_values.starting = ms_spinbox.get()
-    custom_values.long_term = lt_spinbox.get()
-    custom_values.consistent = cons_spinbox.get()
-    custom_values.solid = gs_spinbox.get()
-    custom_values.mistakes = mis_spinbox.get()
-    custom_values.film = fr_spinbox.get()
-    custom_values.strategy = st_spinbox.get()
-    custom_values.energetic = en_spinbox.get()
-    custom_values.professional = pr_spinbox.get()
-    custom_values.aggressive = ag_spinbox.get()
-    custom_values.adaptive = ad_spinbox.get()
-
-    print(custom_values)
-
-    print(scout_entry.get())
-    print(combine_entry.get())
-
+    custom_values.overall_weight = int(pot_ovr_spinbox.get())
+    custom_values.ras_weight = int(ras_spinbox.get())
+    custom_values.report_weight = int(report_spinbox.get())
+    custom_values.all_pro = int(ap_spinbox.get())
+    custom_values.sky_high = int(sh_spinbox.get())
+    custom_values.great_upside = int(gu_spinbox.get())
+    custom_values.great_pfl = int(gp_spinbox.get())
+    custom_values.starting = int(ms_spinbox.get())
+    custom_values.long_term = int(lt_spinbox.get())
+    custom_values.consistent = int(cons_spinbox.get())
+    custom_values.solid = int(gs_spinbox.get())
+    custom_values.mistakes = int(mis_spinbox.get())
+    custom_values.film = int(fr_spinbox.get())
+    custom_values.strategy = int(st_spinbox.get())
+    custom_values.energetic = int(en_spinbox.get())
+    custom_values.professional = int(pr_spinbox.get())
+    custom_values.aggressive = int(ag_spinbox.get())
+    custom_values.adaptive = int(ad_spinbox.get())
     
     players = process.map_players(scout_entry.get(), custom_values)
     combine_min_max_map= process.map_combine(players, combine_entry.get())
@@ -59,6 +54,7 @@ def generate_board():
 
     sorted_players = sorted(players.values(), key=lambda player: player.total_score, reverse=True)
     report.generate_board(sorted_players)
+    messagebox.showinfo("Alert", "Your board file was generated")
 
 window = tkinter.Tk()
 window.title("Automatic Draft Board")
