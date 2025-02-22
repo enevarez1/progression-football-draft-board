@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.0.4 (02/22/2025)
+- UI implemented
+- Dynamic file upload
+
 ## 0.0.3 (02/10/2025)
 - Fixed issue with csv names
 - Added Position and Player link to board.csv
