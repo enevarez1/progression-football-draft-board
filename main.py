@@ -39,6 +39,23 @@ def generate_board():
     print(scout_entry.get())
     print(combine_entry.get())
 
+    custom_values = retrieve.retrieve_custom_values()
+
+    players = process.map_players(scout_entry.get(), custom_values)
+    combine_min_max_map= process.map_combine(players, combine_entry.get())
+
+    for player in players.values():
+        process.derive_ras(player, combine_min_max_map)
+        process.most_likely_raw_overall(player, custom_values)
+
+        # Reconvert the broad_jump because im not mean
+        # Probably move this
+        player.combine[0][2] = Exercise("broad_jump", process.convert_float_to_feet(player.combine[0][2].value))
+    
+
+    sorted_players = sorted(players.values(), key=lambda player: player.total_score, reverse=True)
+    report.generate_board(sorted_players)
+
 window = tkinter.Tk()
 window.title("Automatic Draft Board")
 
@@ -192,19 +209,3 @@ for widget in combine_file_frame.winfo_children():
     widget.grid_configure(pady=5)
 
 window.mainloop()
-
-
-## BUILD A UI
-
-# custom_values = retrieve.retrieve_custom_values()
-
-# players = process.map_players('scout.csv', custom_values)
-# combine_min_max_map= process.map_combine(players, 'combine.csv')
-
-# for player in players.values():
-#     process.derive_ras(player, combine_min_max_map)
-#     process.most_likely_raw_overall(player, custom_values)
-
-#     # Reconvert the broad_jump because im not mean
-#     # Probably move this
-#     player.combine[0][2] = Exercise("broad_jump", process.convert_float_to_feet(player.combine[0][2].value))
