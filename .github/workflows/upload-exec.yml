@@ -1,6 +1,8 @@
 name: Package exe for PyInstaller - Windows/Linux
 
-on: [push]
+on: 
+  release:
+    types: [published]
 jobs:
   pyinstaller-build-windows:
     runs-on: windows-latest
