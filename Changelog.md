@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## 1.0.0 (02/23/2025)
+- Github actions added
+- Alert where board was generated at
+
 ## 0.0.4 (02/22/2025)
 - UI implemented
 - Dynamic file upload

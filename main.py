@@ -54,7 +54,7 @@ def generate_board():
 
     sorted_players = sorted(players.values(), key=lambda player: player.total_score, reverse=True)
     report.generate_board(sorted_players)
-    board_message = f"Your board file was generated at {os.path.dirname(os.path.abspath(__file__))}/ board.csv"
+    board_message = f"Your board file was generated at {os.path.dirname(os.path.abspath(__file__))}/board.csv"
 
     tkinter.messagebox.showinfo("Alert", board_message)
 
