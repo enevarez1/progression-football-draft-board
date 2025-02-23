@@ -13,32 +13,6 @@ DRILL_LIST = [
         'shuttle_60'
     ]
 
-    # POT
-    # All-Pro
-    # sky-high upside
-    # great upside OR overlooked
-    # great PFL player
-    # most starting depth chart
-    # long-term potential
-
-    # CON
-    # consistently impressive
-    # generally solid
-    # mistakes
-    # film room
-HARD_CODE_SCORECARD = {
-    "All-Pro": 10,
-    "sky-high upside": 8,
-    "great upside": 6,
-    "great PFL player": 4,
-    "most starting depth chart": 2,
-    "long-term potential": 1,
-    "consistently impressive": 10,
-    "generally solid": 8,
-    "mistakes": 4,
-    "film room": 1
-}
-
 def map_players(file_path, custom_values):
     players = {}
     culture_scorecard = create_scorecard(custom_values, 'culture')
@@ -124,7 +98,7 @@ def most_likely_raw_overall(player, custom_values):
     potential_weighted *= (1 - failure_chance)
 
     # Map to player
-    player.potential_raw = most_likely_number
+    player.potential_raw = round(most_likely_number, 2)
     player.potential_weighted = round(potential_weighted, 2)
     if len(fail_chance) > 0:
         player.report_score = text_report_score / len(fail_chance)
@@ -143,7 +117,7 @@ def calculate_report_score(paragraph, report_scorecard):
         matches = re.findall(pattern, paragraph)
         total_score += len(matches) * score
     
-    return total_score
+    return round(total_score, 2)
 
 def map_combine(players, file_path):
     df_combine = pd.read_csv(file_path)
@@ -175,11 +149,6 @@ def map_combine(players, file_path):
 def derive_max_min_ras(combine_df):
 
     exercise_map = {}
-
-    # Idea
-    # combine_csv = sorted(combine_csv, key=lambda row: row['40_time'])
-    # max_40 = combine_csv['40_time'][0]
-    # min_40 = combine_csv['40_time'][-1]
 
     # lets clean it up
 
@@ -219,17 +188,6 @@ def convert_float_to_feet(number):
 
 def derive_ras(player, exercise_map):
     score = 0.0
-
-    # run all exercises with the min and max
-    # ras_exercises = [
-    #     derive_score_from_exercise('40_time', *exercise_map['40_time'], player),
-    #     derive_score_from_exercise('bench_press', *exercise_map['bench_press'], player),
-    #     derive_score_from_exercise('broad_jump', *exercise_map['broad_jump'], player),
-    #     derive_score_from_exercise('vertical_jump', *exercise_map['vertical_jump'], player),
-    #     derive_score_from_exercise('cone_drill', *exercise_map['cone_drill'], player),
-    #     derive_score_from_exercise('shuttle_20', *exercise_map['shuttle_20'], player),
-    #     derive_score_from_exercise('shuttle_60', *exercise_map['shuttle_60'], player)
-    # ]
 
     ras_exercise = []
     count = 0

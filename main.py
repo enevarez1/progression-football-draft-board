@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 
-import tkinter.filedialog
 from src.report.model import Exercise, UserValues
-from src.report import process, report, retrieve
-from tkinter import messagebox
+from src.report import process, report
 
 import tkinter as tkinter
+import tkinter.filedialog
+import os
 
 
 def select_file(entry):
@@ -54,7 +54,9 @@ def generate_board():
 
     sorted_players = sorted(players.values(), key=lambda player: player.total_score, reverse=True)
     report.generate_board(sorted_players)
-    messagebox.showinfo("Alert", "Your board file was generated")
+    board_message = f"Your board file was generated at {os.path.dirname(os.path.abspath(__file__))}/board.csv"
+
+    tkinter.messagebox.showinfo("Alert", board_message)
 
 window = tkinter.Tk()
 window.title("Automatic Draft Board")

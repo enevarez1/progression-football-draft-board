@@ -1,0 +1,28 @@
+name: Package exe for PyInstaller - Windows/Linux
+
+on: 
+  release:
+    types: [published]
+jobs:
+  pyinstaller-build-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Create Executable
+        uses: sayyid5416/pyinstaller@v1
+        with:
+          python_ver: '3.13.2'
+          spec: 'main.py'
+          requirements: 'requirements.txt'
+          upload_exe_with_name: 'Draft Board Tool Windows'
+          options: --onefile, --name "Draft Board Tool Windows", --windowed, 
+  pyinstaller-build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create Executable
+        uses: sayyid5416/pyinstaller@v1
+        with:
+          python_ver: '3.13.2'
+          spec: 'main.py'
+          requirements: 'requirements.txt'
+          upload_exe_with_name: 'Draft Board Tool Linux'
+          options: --onefile, --name "Draft Board Tool Linux", --windowed, 
