@@ -4,15 +4,14 @@ from tkinter import ttk
 from src.report.model import Exercise, UserValues
 from src.report import process, report
 
-import tkinter as tkinter
 import tkinter as tk
 import tkinter.filedialog
 import os
 
 
 def select_file(entry):
-    filename = tkinter.filedialog.askopenfilename()
-    entry.delete(0, tkinter.END)
+    filename = tk.filedialog.askopenfilename()
+    entry.delete(0, tk.END)
     entry.insert(0, filename)
 
 def map_spinboxes_to_user_values():
@@ -68,8 +67,8 @@ def generate_board():
     report.generate_board(sorted_players)
     board_message = f"Your board file was generated at {os.path.dirname(os.path.abspath(__file__))}/board.csv"
 
-    tkinter.messagebox.showinfo("Alert", board_message)
-
+    tk.messagebox.showinfo("Alert", board_message)
+    
 window = tk.Tk()
 window.title("Automatic Draft Board")
 window.geometry("1000x750")
@@ -101,7 +100,6 @@ def create_spinbox_row(frame, label_text, var, row, col):
     ttk.Label(frame, text=label_text).grid(row=row, column=col*2, sticky="w", padx=10, pady=7)
     ttk.Spinbox(frame, from_=-100, to=100, width=6, textvariable=var, justify="center").grid(row=row, column=col*2+1, padx=5, pady=7)
 
-# Variables
 def create_var_dict(keys, default=0):
     return {key: tk.IntVar(value=default) for key in keys}
 
