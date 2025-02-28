@@ -1,4 +1,4 @@
-name: Package exe for PyInstaller - Windows/Linux
+name: Package exe for PyInstaller - Windows/Linux/Mac
 
 on: 
   release:
