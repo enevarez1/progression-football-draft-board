@@ -24,7 +24,7 @@ def map_players(file_path, custom_values):
                 ## It could just be media report that was old report.
                 if lines['player_id'] in players:
                     player = players[lines['player_id']]
-                    if player.culture == '':
+                    if player.culture == 'Unknown':
                         culture = lines['culture']
                         player.culture = culture
                         player.culture_score = culture_scorecard[culture]
@@ -35,10 +35,9 @@ def map_players(file_path, custom_values):
                 ## Make a new player if they dont exist, using the player Id as the Key
                 else:
                     evaluation = Evaluation(lines['evaluation'], lines['range'], lines['confidence'], lines['text'])
-                    culture = lines['culture']
+                    culture = lines['culture'] if lines['culture'] != '' else 'Unknown'
                     player = Player(lines['first_name'], lines['last_name'], lines['position'], lines['age'], lines['player_id'], culture, evaluation)
-                    if 0 < len(culture):
-                        player.culture_score = culture_scorecard[culture]
+                    player.culture_score = culture_scorecard[culture]
                     players[player.player_id] = player
 
                 
@@ -86,7 +85,7 @@ def most_likely_raw_overall(player, custom_values):
         # If its in the range of the reports, I want it, 
         # I also only care about text reports in this range
         if lower_limit <= rounded_score <= high_limit:
-            text_report_score += calculate_report_score(evaluation.report, custom_scorecard)
+            text_report_score += round(calculate_report_score(evaluation.report, custom_scorecard), 2)
             fail_chance.append(1-(int(evaluation.confidence)*.01))
 
 
@@ -142,6 +141,7 @@ def map_combine(players, file_path):
 
                 # Also map the player link
                 players[player_id].link = player_row['link']
+                players[player_id].wonderlic = int(player_row['wonderlic'])
 
                 players[player_id].combine.append(combine)
     return derive_max_min_ras(df_combine)
@@ -226,7 +226,8 @@ def create_scorecard(custom_values, type):
             "Energetic": custom_values.energetic,
             "Professional": custom_values.professional,
             "Aggressive": custom_values.aggressive,
-            "Adaptable": custom_values.adaptive
+            "Adaptable": custom_values.adaptive,
+            "Unknown": custom_values.unknown
         }
     elif type == 'report':
         return {
@@ -237,7 +238,9 @@ def create_scorecard(custom_values, type):
             "most starting depth chart": custom_values.starting,
             "long-term potential": custom_values.long_term,
             "consistently impressive": custom_values.consistent,
-            "generally solid": custom_values.solid,
+            "performance matched ": custom_values.performance,
             "mistakes": custom_values.mistakes,
-            "film room": custom_values.film
+            "film room": custom_values.film,
+            "trailing technique": custom_values.trail,
+            "leadership potential": custom_values.leader,
         }

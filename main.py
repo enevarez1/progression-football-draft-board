@@ -20,6 +20,7 @@ def map_spinboxes_to_user_values():
         "overall_weight": score_vars["Potential Overall"],
         "ras_weight": score_vars["RAS Score"],
         "report_weight": score_vars["Report Score"],
+        "wonderlic": score_vars['Wonderlic'],
         "all_pro": report_vars["All Pro"],
         "sky_high": report_vars["Sky High"],
         "great_upside": report_vars["Great Upside"],
@@ -27,14 +28,17 @@ def map_spinboxes_to_user_values():
         "starting": report_vars["Most Starting Depth Chart"],
         "long_term": report_vars["Not have long-term Potential"],
         "consistent": report_vars["Consistently Impressive"],
-        "solid": report_vars["Generally Solid"],
+        "performance": report_vars["Performance Matches Reputation"],
         "mistakes": report_vars["Makes Mistakes"],
         "film": report_vars["Film Room"],
+        "trail": report_vars["Trailing Technique"],
+        "leader": report_vars["Leadership Potential"],
         "strategy": culture_vars["Strategic"],
         "energetic": culture_vars["Energetic"],
         "professional": culture_vars["Professional"],
         "aggressive": culture_vars["Aggressive"],
-        "adaptive": culture_vars["Adaptable"]
+        "adaptive": culture_vars["Adaptable"],
+        "unknown": culture_vars["Unknown"]
     }
 
     for attr, var in attribute_map.items():
@@ -47,7 +51,7 @@ def generate_board():
     custom_values = map_spinboxes_to_user_values()
     
     players = process.map_players(file_upload_entries["Scouting Report"].get(), custom_values)
-    combine_min_max_map= process.map_combine(players, file_upload_entries["Combine Report"].get())
+    combine_min_max_map= process.map_combine(players, file_upload_entries["Draft Class Report"].get())
 
     for player in players.values():
         process.derive_ras(player, combine_min_max_map)
@@ -60,15 +64,16 @@ def generate_board():
         # Do the final total score for csv sorting, with user weights
         potential_weighted = player.potential_weighted * custom_values.overall_weight
         ras_score = player.ras_score * custom_values.ras_weight
-        report_score = player.report_score * custom_values.report_weight
-        player.total_score = potential_weighted + ras_score + report_score + player.culture_score
+        report_score = round(player.report_score * custom_values.report_weight, 2)
+        wonderlic_score = player.wonderlic * custom_values.wonderlic
+        player.total_score = potential_weighted + ras_score + report_score + player.culture_score + wonderlic_score
 
     sorted_players = sorted(players.values(), key=lambda player: player.total_score, reverse=True)
     report.generate_board(sorted_players)
     board_message = f"Your board file was generated at {os.path.dirname(os.path.abspath(__file__))}/board.csv"
 
     tk.messagebox.showinfo("Alert", board_message)
-    
+
 window = tk.Tk()
 window.title("Automatic Draft Board")
 window.geometry("1000x750")
@@ -103,11 +108,12 @@ def create_spinbox_row(frame, label_text, var, row, col):
 def create_var_dict(keys, default=0):
     return {key: tk.IntVar(value=default) for key in keys}
 
-score_vars = create_var_dict(["Potential Overall", "RAS Score", "Report Score"], default=1)
-report_vars = create_var_dict(["All Pro", "Sky High", "Great PFL Player", "Great Upside",
+score_vars = create_var_dict(["Potential Overall", "RAS Score", "Report Score", "Wonderlic"], default=1)
+report_vars = create_var_dict(["All Pro", "Sky High","Leadership Potential", "Great PFL Player", "Great Upside",
                                "Most Starting Depth Chart", "Not have long-term Potential",
-                               "Consistently Impressive", "Generally Solid", "Makes Mistakes", "Film Room"])
-culture_vars = create_var_dict(["Adaptable", "Aggressive", "Energetic", "Professional", "Strategic"])
+                               "Consistently Impressive", 
+                               "Performance Matches Reputation", "Makes Mistakes", "Film Room", "Trailing Technique"])
+culture_vars = create_var_dict(["Adaptable", "Aggressive", "Energetic", "Professional", "Strategic", "Unknown"])
 
 def create_section(title, vars_dict, cols=2):
     frame = ttk.LabelFrame(content_frame, text=title, padding=15)
@@ -116,7 +122,7 @@ def create_section(title, vars_dict, cols=2):
         row, col = divmod(i, cols)
         create_spinbox_row(frame, label, var, row, col)
 
-create_section("Overall Score Weights", score_vars, cols=3)
+create_section("Overall Score Weights", score_vars, cols=4)
 create_section("Report Text Weights", report_vars, cols=3)
 create_section("Culture Weights", culture_vars, cols=3)
 
@@ -129,7 +135,7 @@ def create_file_upload_section(title):
     ttk.Button(frame, text="Browse", command=lambda: select_file(entry)).pack(side="left", padx=5)
     file_upload_entries[title] = entry
 create_file_upload_section("Scouting Report")
-create_file_upload_section("Combine Report")
+create_file_upload_section("Draft Class Report")
 
 ttk.Button(content_frame, text="Generate Board", command=generate_board).pack(pady=20, fill="x")
 
