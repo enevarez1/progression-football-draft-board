@@ -1,7 +1,7 @@
 # Automated Draft Board for Progression Football
 
 ### Summary
-Takes scouting reports from ProgressionFootball.com, and generates a draft report based on draft reports.
+Takes scouting reports, and draft class reports from ProgressionFootball.com, and generates a draft report based on draft reports.
 
 - Formula to get the potential overall from evaluations
 - RAS Scoring for all prospects

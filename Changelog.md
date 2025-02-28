@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## 1.0.1 (02/27/2025)
+- Refined UI
+- Added more fields
+- Fixed bug with UI
+
 ## 1.0.0 (02/23/2025)
 - Github actions added
 - Alert where board was generated at

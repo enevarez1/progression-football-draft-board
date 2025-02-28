@@ -11,6 +11,7 @@ HEADER = [
         'Potential Raw Weighted',
         'RAS Score',
         'Report Score',
+        'Wonderlic Score',
         'Total Board Score',
         'Link'
     ]
@@ -40,6 +41,7 @@ def flatten_player(player):
         'Potential Raw Weighted': player.potential_weighted,
         'RAS Score': player.ras_score,
         'Report Score': player.report_score,
+        'Wonderlic Score': player.wonderlic,
         'Total Board Score': player.total_score,
         'Link': player.link
     }
