@@ -180,3 +180,6 @@ combine_good.csv
 scout_good.csv
 combine.csv
 scout.csv
+
+# JSON stuff
+exported_weights.json
