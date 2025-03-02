@@ -17,14 +17,14 @@ HEADER = [
     ]
 
 # Method to write to CSV
-def generate_board(players):
+def generate_board(players, file_name):
     csv_data = []
     for player in players:
         row = flatten_player(player)
         row['Player ID'] = player.player_id
         csv_data.append(row)
 
-    with open('board.csv', 'w', newline='') as csvfile:
+    with open(file_name, 'w', newline='') as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=HEADER)
         writer.writeheader()
         writer.writerows(csv_data)

@@ -129,7 +129,7 @@ def generate_board():
         player.total_score = potential_weighted + ras_score + report_score + player.culture_score + wonderlic_score
 
     sorted_players = sorted(players.values(), key=lambda player: player.total_score, reverse=True)
-    report.generate_board(sorted_players)
+    report.generate_board(sorted_players, file_path)
     directory_path = os.path.abspath(file_path)
     board_message = f"Your board file was generated at {directory_path}"
 
