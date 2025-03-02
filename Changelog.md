@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## 1.0.2 (03/01/2025)
+- Exporting/Importing Weights
+- Name your own Board
+
 ## 1.0.1 (02/27/2025)
 - Refined UI
 - Added more fields

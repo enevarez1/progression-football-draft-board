@@ -7,6 +7,7 @@ from src.report import process, report
 import tkinter as tk
 import tkinter.filedialog
 import os
+import json
 
 
 def select_file(entry):
@@ -14,13 +15,12 @@ def select_file(entry):
     entry.delete(0, tk.END)
     entry.insert(0, filename)
 
-def map_spinboxes_to_user_values():
-    custom_values = UserValues()
+def map_spinboxes_to_attributes(as_int=False):
     attribute_map = {
         "overall_weight": score_vars["Potential Overall"],
         "ras_weight": score_vars["RAS Score"],
         "report_weight": score_vars["Report Score"],
-        "wonderlic": score_vars['Wonderlic'],
+        "wonderlic": score_vars["Wonderlic"],
         "all_pro": report_vars["All Pro"],
         "sky_high": report_vars["Sky High"],
         "great_upside": report_vars["Great Upside"],
@@ -40,13 +40,73 @@ def map_spinboxes_to_user_values():
         "adaptive": culture_vars["Adaptable"],
         "unknown": culture_vars["Unknown"]
     }
+    
+    return {key: var.get() if as_int else var for key, var in attribute_map.items()}
+
+
+def map_spinboxes_to_user_values():
+    custom_values = UserValues()
+    attribute_map = map_spinboxes_to_attributes(as_int=True)
 
     for attr, var in attribute_map.items():
-        setattr(custom_values, attr, var.get())
+        setattr(custom_values, attr, var)
 
     return custom_values
 
+def generate_export_json():
+    json_map = map_spinboxes_to_attributes(as_int=True)
+
+    file_name = tk.simpledialog.askstring("Save As", "Enter a name for the exported weights file (without extension):")
+
+    if not file_name:
+        return  
+
+    file_path = f"{file_name}.json"
+
+    try:
+        with open(file_path, 'w') as json_file:
+            json.dump(json_map, json_file, indent=4)
+        directory_path = os.path.abspath(file_path)
+        export_message = f"Your Exported JSON file was saved at:\n{directory_path}"
+        tk.messagebox.showinfo("Export Successful", export_message)
+    except Exception as e:
+        tk.messagebox.showerror("Error", f"Failed to save file: {e}")
+
+def import_custom_values():
+    file_path = tk.filedialog.askopenfilename(
+        title="Select JSON File",
+        filetypes=[("JSON files", "*.json"), ("All Files", "*.*")]
+    )
+
+    if not file_path:
+        return
+    
+    custom_values = {}
+
+    try:
+        with open(file_path, 'r') as file:
+            custom_values = json.load(file)
+    except FileNotFoundError:
+        tk.messagebox.showerror("Error", f"Error: File not found. Please select a valid file.")
+        return None
+    except json.JSONDecodeError:
+        tk.messagebox.showinfo("Error", f"Error: Invalid JSON format in {file_path}")
+        return None
+    
+    gearbox_values = map_spinboxes_to_attributes(as_int=False)
+    for key, value in custom_values.items():
+        if key in gearbox_values:
+            gearbox_values[key].set(value)
+
+    tk.messagebox.showinfo("Success", "Weights imported successfully and updated!")
+
 def generate_board():
+    file_name = tk.simpledialog.askstring("Save As", "Enter a name for your board csv (without extension):")
+
+    if not file_name:
+        return  
+
+    file_path = f"{file_name}.csv"
 
     custom_values = map_spinboxes_to_user_values()
     
@@ -69,8 +129,9 @@ def generate_board():
         player.total_score = potential_weighted + ras_score + report_score + player.culture_score + wonderlic_score
 
     sorted_players = sorted(players.values(), key=lambda player: player.total_score, reverse=True)
-    report.generate_board(sorted_players)
-    board_message = f"Your board file was generated at {os.path.dirname(os.path.abspath(__file__))}/board.csv"
+    report.generate_board(sorted_players, file_path)
+    directory_path = os.path.abspath(file_path)
+    board_message = f"Your board file was generated at {directory_path}"
 
     tk.messagebox.showinfo("Alert", board_message)
 
@@ -137,6 +198,15 @@ def create_file_upload_section(title):
 create_file_upload_section("Scouting Report")
 create_file_upload_section("Draft Class Report")
 
-ttk.Button(content_frame, text="Generate Board", command=generate_board).pack(pady=20, fill="x")
+button_frame = ttk.LabelFrame(content_frame, text='Actions', padding=15)
+button_frame.pack(fill='x',padx=10, pady=10)
+
+for i in range(3):
+    button_frame.columnconfigure(i, weight=1)
+
+
+ttk.Button(button_frame, text="Export Weights", command=generate_export_json).grid(row=0, column=0, padx=10, pady=10, sticky="ew")
+ttk.Button(button_frame, text="Import Weights", command=import_custom_values).grid(row=0, column=1, padx=10, pady=10, sticky="ew")
+ttk.Button(button_frame, text="Generate Board", command=generate_board).grid(row=0, column=2, padx=10, pady=10, sticky="ew")
 
 window.mainloop()
