@@ -15,35 +15,38 @@ def select_file(entry):
     entry.delete(0, tk.END)
     entry.insert(0, filename)
 
-def map_spinboxes_to_attibute_map():
-    return {
-        "overall_weight": score_vars["Potential Overall"].get(),
-        "ras_weight": score_vars["RAS Score"].get(),
-        "report_weight": score_vars["Report Score"].get(),
-        "wonderlic": score_vars['Wonderlic'].get(),
-        "all_pro": report_vars["All Pro"].get(),
-        "sky_high": report_vars["Sky High"].get(),
-        "great_upside": report_vars["Great Upside"].get(),
-        "great_pfl": report_vars["Great PFL Player"].get(),
-        "starting": report_vars["Most Starting Depth Chart"].get(),
-        "long_term": report_vars["Not have long-term Potential"].get(),
-        "consistent": report_vars["Consistently Impressive"].get(),
-        "performance": report_vars["Performance Matches Reputation"].get(),
-        "mistakes": report_vars["Makes Mistakes"].get(),
-        "film": report_vars["Film Room"].get(),
-        "trail": report_vars["Trailing Technique"].get(),
-        "leader": report_vars["Leadership Potential"].get(),
-        "strategy": culture_vars["Strategic"].get(),
-        "energetic": culture_vars["Energetic"].get(),
-        "professional": culture_vars["Professional"].get(),
-        "aggressive": culture_vars["Aggressive"].get(),
-        "adaptive": culture_vars["Adaptable"].get(),
-        "unknown": culture_vars["Unknown"].get()
+def map_spinboxes_to_attributes(as_int=False):
+    attribute_map = {
+        "overall_weight": score_vars["Potential Overall"],
+        "ras_weight": score_vars["RAS Score"],
+        "report_weight": score_vars["Report Score"],
+        "wonderlic": score_vars["Wonderlic"],
+        "all_pro": report_vars["All Pro"],
+        "sky_high": report_vars["Sky High"],
+        "great_upside": report_vars["Great Upside"],
+        "great_pfl": report_vars["Great PFL Player"],
+        "starting": report_vars["Most Starting Depth Chart"],
+        "long_term": report_vars["Not have long-term Potential"],
+        "consistent": report_vars["Consistently Impressive"],
+        "performance": report_vars["Performance Matches Reputation"],
+        "mistakes": report_vars["Makes Mistakes"],
+        "film": report_vars["Film Room"],
+        "trail": report_vars["Trailing Technique"],
+        "leader": report_vars["Leadership Potential"],
+        "strategy": culture_vars["Strategic"],
+        "energetic": culture_vars["Energetic"],
+        "professional": culture_vars["Professional"],
+        "aggressive": culture_vars["Aggressive"],
+        "adaptive": culture_vars["Adaptable"],
+        "unknown": culture_vars["Unknown"]
     }
+    
+    return {key: var.get() if as_int else var for key, var in attribute_map.items()}
+
 
 def map_spinboxes_to_user_values():
     custom_values = UserValues()
-    attribute_map = map_spinboxes_to_attibute_map()
+    attribute_map = map_spinboxes_to_attributes(as_int=True)
 
     for attr, var in attribute_map.items():
         setattr(custom_values, attr, var)
@@ -51,20 +54,59 @@ def map_spinboxes_to_user_values():
     return custom_values
 
 def generate_export_json():
-    json_map = map_spinboxes_to_attibute_map()
+    json_map = map_spinboxes_to_attributes(as_int=True)
 
-    file_path = "exported_weights.json"
+    file_name = tk.simpledialog.askstring("Save As", "Enter a name for the exported weights file (without extension):")
 
-    with open(file_path, 'w') as json_file:
-        json.dump(json_map, json_file, indent=4)
-    directory_path = os.path.abspath(file_path)
+    if not file_name:
+        return  
 
-    export_message = f"Your Exported Json file was generated at {directory_path}"
+    file_path = f"{file_name}.json"
 
-    tk.messagebox.showinfo("Alert", export_message)
+    try:
+        with open(file_path, 'w') as json_file:
+            json.dump(json_map, json_file, indent=4)
+        directory_path = os.path.abspath(file_path)
+        export_message = f"Your Exported JSON file was saved at:\n{directory_path}"
+        tk.messagebox.showinfo("Export Successful", export_message)
+    except Exception as e:
+        tk.messagebox.showerror("Error", f"Failed to save file: {e}")
 
+def import_custom_values():
+    file_path = tk.filedialog.askopenfilename(
+        title="Select JSON File",
+        filetypes=[("JSON files", "*.json"), ("All Files", "*.*")]
+    )
+
+    if not file_path:
+        return
     
+    custom_values = {}
+
+    try:
+        with open(file_path, 'r') as file:
+            custom_values = json.load(file)
+    except FileNotFoundError:
+        tk.messagebox.showerror("Error", f"Error: File not found. Please select a valid file.")
+        return None
+    except json.JSONDecodeError:
+        tk.messagebox.showinfo("Error", f"Error: Invalid JSON format in {file_path}")
+        return None
+    
+    gearbox_values = map_spinboxes_to_attributes(as_int=False)
+    for key, value in custom_values.items():
+        if key in gearbox_values:
+            gearbox_values[key].set(value)
+
+    tk.messagebox.showinfo("Success", "Weights imported successfully and updated!")
+
 def generate_board():
+    file_name = tk.simpledialog.askstring("Save As", "Enter a name for your board csv (without extension):")
+
+    if not file_name:
+        return  
+
+    file_path = f"{file_name}.csv"
 
     custom_values = map_spinboxes_to_user_values()
     
@@ -88,7 +130,7 @@ def generate_board():
 
     sorted_players = sorted(players.values(), key=lambda player: player.total_score, reverse=True)
     report.generate_board(sorted_players)
-    directory_path = os.path.abspath("board.csv")
+    directory_path = os.path.abspath(file_path)
     board_message = f"Your board file was generated at {directory_path}"
 
     tk.messagebox.showinfo("Alert", board_message)
@@ -155,7 +197,6 @@ def create_file_upload_section(title):
     file_upload_entries[title] = entry
 create_file_upload_section("Scouting Report")
 create_file_upload_section("Draft Class Report")
-create_file_upload_section("Import JSON file")
 
 button_frame = ttk.LabelFrame(content_frame, text='Actions', padding=15)
 button_frame.pack(fill='x',padx=10, pady=10)
@@ -165,7 +206,7 @@ for i in range(3):
 
 
 ttk.Button(button_frame, text="Export Weights", command=generate_export_json).grid(row=0, column=0, padx=10, pady=10, sticky="ew")
-ttk.Button(button_frame, text="Import Weights", command=generate_board).grid(row=0, column=1, padx=10, pady=10, sticky="ew")
+ttk.Button(button_frame, text="Import Weights", command=import_custom_values).grid(row=0, column=1, padx=10, pady=10, sticky="ew")
 ttk.Button(button_frame, text="Generate Board", command=generate_board).grid(row=0, column=2, padx=10, pady=10, sticky="ew")
 
 window.mainloop()
