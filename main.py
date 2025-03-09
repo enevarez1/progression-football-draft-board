@@ -111,7 +111,7 @@ def generate_board():
     custom_values = map_spinboxes_to_user_values()
     
     players = process.map_players(file_upload_entries["Scouting Report"].get(), custom_values)
-    combine_min_max_map= process.map_combine(players, file_upload_entries["Draft Class Report"].get())
+    combine_min_max_map = process.map_combine(players, file_upload_entries["Draft Class Report"].get())
 
     for player in players.values():
         process.derive_ras(player, combine_min_max_map)

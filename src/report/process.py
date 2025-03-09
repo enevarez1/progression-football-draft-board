@@ -1,5 +1,6 @@
 import csv
 import re
+import copy
 import pandas as pd 
 from src.report.model import Evaluation, Exercise, Player
 
@@ -148,24 +149,30 @@ def map_combine(players, file_path):
 
 def derive_max_min_ras(combine_df):
 
+    position_list = ['QB','HB','FB','WR','TE','T','G','C','DT','DE','MLB','OLB','CB','S','K','P']
+
+    position_ras_map = {}
+
     exercise_map = {}
 
     # lets clean it up
+    for position in position_list:
+        position_df = combine_df.loc[combine_df['position'] == position]
 
-    for drill in DRILL_LIST:
-        sorted_df = combine_df.sort_values(by=drill)
-        if drill == 'broad_jump':
-            # Need to convert because its a string
-            min_drill_value = convert_string_to_float(sorted_df[drill].iloc[0])
-            max_drill_value = convert_string_to_float(sorted_df[drill].iloc[-1])
-        else:
-            min_drill_value = sorted_df[drill].iloc[0].item()
-            max_drill_value = sorted_df[drill].iloc[-1].item()
-        exercise_map[drill] = (min_drill_value, max_drill_value)
-
-
+        for drill in DRILL_LIST:
+            sorted_df = position_df.sort_values(by=drill)
+            if drill == 'broad_jump':
+                # Need to convert because its a string
+                min_drill_value = convert_string_to_float(sorted_df[drill].iloc[0])
+                max_drill_value = convert_string_to_float(sorted_df[drill].iloc[-1])
+            else:
+                min_drill_value = sorted_df[drill].iloc[0].item()
+                max_drill_value = sorted_df[drill].iloc[-1].item()
+            exercise_map[drill] = (min_drill_value, max_drill_value)
+        position_ras_map[position] = copy.deepcopy(exercise_map)
+        exercise_map.clear()
     # For each exercise, sort, grab the first and last
-    return exercise_map
+    return position_ras_map
 
 def convert_string_to_float(string):
     
@@ -192,7 +199,7 @@ def derive_ras(player, exercise_map):
     ras_exercise = []
     count = 0
     for drill in DRILL_LIST:
-        ras_exercise.append(derive_score_from_exercise(count, *exercise_map[drill], player))
+        ras_exercise.append(derive_score_from_exercise(count, *exercise_map[player.position][drill], player))
         count += 1
     
 
